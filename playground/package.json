@@ -1,0 +1,22 @@
+{
+  "name": "carrot-playground",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1 --port 4177",
+    "build": "vite build"
+  },
+  "dependencies": {
+    "@huggingface/transformers": "4.2.0",
+    "@katana-video/carrot": "workspace:*",
+    "@katana-video/carrot-backends": "workspace:*",
+    "@katana-video/web-bg-removal": "https://registry.npmjs.org/@katana-video/web-bg-removal/-/web-bg-removal-0.1.1.tgz",
+    "mediabunny": "1.50.3"
+  },
+  "devDependencies": {
+    "typescript": "7.0.2",
+    "vite": "8.1.4",
+    "@webgpu/types": "^0.1.71",
+    "playwright": "^1.58.0"
+  }
+}

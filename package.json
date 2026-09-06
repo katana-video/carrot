@@ -1,0 +1,21 @@
+{
+  "name": "carrot-monorepo",
+  "private": true,
+  "description": "Carrot 🥕 — browser-native media engine with a JSON IR (engine + backends)",
+  "license": "MIT",
+  "packageManager": "pnpm@10.33.2",
+  "scripts": {
+    "test": "pnpm --filter @katana-video/carrot test",
+    "test:backends": "pnpm --filter @katana-video/carrot-backends test",
+    "typecheck": "pnpm -r typecheck",
+    "build": "pnpm --filter @katana-video/carrot build && pnpm --filter @katana-video/carrot-backends build",
+    "dev:harness": "pnpm --filter @katana-video/carrot dev:harness",
+    "dev:playground": "pnpm --filter carrot-playground dev",
+    "build:playground": "pnpm --filter carrot-playground build",
+    "gen:schema": "tsx scripts/gen-schema.mts"
+  },
+  "devDependencies": {
+    "tsx": "^4.20.0",
+    "typescript": "7.0.2"
+  }
+}

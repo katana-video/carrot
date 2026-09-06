@@ -1,0 +1,26 @@
+# Carrot 🥕 — browser-native media engine with a JSON IR
+
+> Carrot executes media edits described as JSON documents (the "IR") entirely in
+> the browser: trim, concat, crop, resize, overlays, burned or soft subtitles,
+> filters, transitions, container/codec conversion with per-track stream copy,
+> GIF, stills; plus pluggable model backends (transcribe, translate, denoise,
+> remove background). npm: @katana-video/carrot, @katana-video/carrot-backends.
+> Repo: https://github.com/katana-video/carrot (MIT).
+
+To author a document, read in this order:
+
+- [IR specification](https://github.com/katana-video/carrot/blob/main/docs/ir-spec.md): the normative format — envelope (assets + operations), the render document (timeline, overlays, effects, output), symbolic scalars, placement, the audio model, validation rules with decision tags.
+- [Worked examples](https://github.com/katana-video/carrot/blob/main/docs/examples.md): 60+ request → document pairs, every document re-validated by the planner. Copy their shapes.
+- [JSON Schema](https://katana-video.github.io/carrot/schema/0.1/document.json): machine-checkable schema of the document, generated from the engine's zod source (also at docs/schema/0.1/document.json in the repo). Field descriptions inside the schema are authoritative for enums and ranges.
+
+Authoring rules that matter most:
+- `version` is "0.1". Asset ids are opaque strings you choose; `label` is the filename and is metadata only.
+- v0.1 documents have operations of type `render` (and, on hosts with backends, `transcribe`, `translate`, `removebg`); a `source` may name an asset or an earlier operation's id.
+- Every visual overlay needs `place` and `placementSource` ('user' if the request said where, else 'assumed'); every crop needs `regionSource` likewise.
+- `output.container` picks the deliverable (mp4, webm, mkv, mp3, wav, ogg, gif, png, jpeg); `output.name` is the base filename without extension.
+- Effects preserve duration; timeline edits (range, speed) change it. Times are seconds on the clock the field documents.
+
+For integrating the engine (not authoring documents):
+- [README](https://github.com/katana-video/carrot/blob/main/README.md): quick start — worker host, client, plan(), runPipeline().
+- [Backends](https://github.com/katana-video/carrot/blob/main/docs/backends.md): kernels and derivers, composing a worker, weights and mirroring.
+- [Design](https://github.com/katana-video/carrot/blob/main/docs/design.md) and [vocabulary](https://github.com/katana-video/carrot/blob/main/docs/vocabulary.md).

@@ -1,0 +1,4 @@
+packages:
+  - engine
+  - backends
+  - playground

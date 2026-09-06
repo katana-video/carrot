@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <link rel="icon" href="data:," />
+  <title>media-engine harness</title>
+  <style>
+    :root { color-scheme: light dark; }
+    body { font-family: ui-monospace, monospace; font-size: .85rem; max-width: 900px; margin: 2rem auto; padding: 0 1rem; }
+    #status { white-space: pre-wrap; }
+  </style>
+</head>
+<body>
+  <h1>media-engine test harness</h1>
+  <p>Driven by <code>harness/run.mjs</code>; exposes <code>__cases()</code> and <code>__runCase(name, backend)</code>.
+     Manual use: open the console and call <code>__runCase('crop-left', 'webgpu')</code>.</p>
+  <div id="status"></div>
+  <script type="module" src="./backends-entry.ts"></script>
+  <script type="module" src="./harness.ts"></script>
+</body>
+</html>

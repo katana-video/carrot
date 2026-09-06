@@ -1,0 +1,110 @@
+{
+  "name": "@katana-video/carrot-backends",
+  "version": "0.1.0",
+  "description": "Model-backed backends for Carrot \ud83e\udd55: background removal (web-bg-removal), audio denoise (DeepFilterNet/RNNoise), transcription (whisper) and translation (OPUS-MT) \u2014 each an optional subpath import that registers itself against the engine's kernel/deriver contracts. Runs in the browser, weights fetched on first use.",
+  "license": "MIT",
+  "author": "Sam Bhattacharyya",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/katana-video/carrot.git",
+    "directory": "backends"
+  },
+  "homepage": "https://github.com/katana-video/carrot#readme",
+  "bugs": {
+    "url": "https://github.com/katana-video/carrot/issues"
+  },
+  "keywords": [
+    "carrot",
+    "webcodecs",
+    "webgpu",
+    "background-removal",
+    "denoise",
+    "whisper",
+    "transcription",
+    "translation",
+    "browser",
+    "ml"
+  ],
+  "type": "module",
+  "sideEffects": false,
+  "main": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./weights": "./src/weights.ts",
+    "./removebg": "./src/removebg.ts",
+    "./denoise": "./src/denoise/index.ts",
+    "./whisper": "./src/whisper/index.ts",
+    "./translate": "./src/translate/index.ts"
+  },
+  "publishConfig": {
+    "access": "public",
+    "main": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "exports": {
+      ".": {
+        "types": "./dist/index.d.ts",
+        "import": "./dist/index.js"
+      },
+      "./weights": {
+        "types": "./dist/weights.d.ts",
+        "import": "./dist/weights.js"
+      },
+      "./removebg": {
+        "types": "./dist/removebg.d.ts",
+        "import": "./dist/removebg.js"
+      },
+      "./denoise": {
+        "types": "./dist/denoise/index.d.ts",
+        "import": "./dist/denoise/index.js"
+      },
+      "./whisper": {
+        "types": "./dist/whisper/index.d.ts",
+        "import": "./dist/whisper/index.js"
+      },
+      "./translate": {
+        "types": "./dist/translate/index.d.ts",
+        "import": "./dist/translate/index.js"
+      }
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE",
+    "WEIGHTS_LICENSE"
+  ],
+  "scripts": {
+    "typecheck": "tsc --noEmit && tsc --noEmit -p tsconfig.test.json",
+    "test": "vitest run",
+    "build": "tsup && tsc -p tsconfig.build.json",
+    "prepublishOnly": "pnpm build"
+  },
+  "dependencies": {
+    "zod": "4.4.3"
+  },
+  "peerDependencies": {
+    "@huggingface/transformers": "^4.2.0",
+    "@katana-video/carrot": "^0.1.0",
+    "@katana-video/web-bg-removal": "^0.1.1",
+    "mediabunny": "^1.50.0"
+  },
+  "peerDependenciesMeta": {
+    "@huggingface/transformers": {
+      "optional": true
+    },
+    "@katana-video/web-bg-removal": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@huggingface/transformers": "4.2.0",
+    "@katana-video/carrot": "workspace:*",
+    "@katana-video/web-bg-removal": "https://registry.npmjs.org/@katana-video/web-bg-removal/-/web-bg-removal-0.1.1.tgz",
+    "@types/node": "^24.10.1",
+    "@webgpu/types": "^0.1.71",
+    "mediabunny": "1.50.3",
+    "tsup": "^8.5.0",
+    "typescript": "7.0.2",
+    "vitest": "^4.1.10"
+  }
+}

@@ -1,0 +1,113 @@
+{
+  "name": "@katana-video/carrot",
+  "version": "0.1.0",
+  "description": "Carrot \ud83e\udd55 \u2014 media pipelines for the browser, on WebCodecs and Mediabunny. A declarative job IR compiled to streaming spans over hardware codecs, with WebGPU/WebGL2 compositing. The layer above Mediabunny.",
+  "license": "MIT",
+  "author": "Sam Bhattacharyya",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/katana-video/carrot.git",
+    "directory": "engine"
+  },
+  "homepage": "https://github.com/katana-video/carrot#readme",
+  "bugs": {
+    "url": "https://github.com/katana-video/carrot/issues"
+  },
+  "keywords": [
+    "webcodecs",
+    "mediabunny",
+    "webgpu",
+    "video",
+    "audio",
+    "ffmpeg",
+    "browser",
+    "media-engine",
+    "transcode",
+    "remux"
+  ],
+  "type": "module",
+  "sideEffects": false,
+  "main": "src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./codec-tables": "./src/codec-tables.ts",
+    "./client": "./src/host/client.ts",
+    "./place": "./src/ir/place.ts",
+    "./qr": "./src/qr.ts",
+    "./facts": "./src/ir/facts.ts",
+    "./captions": "./src/executor/captions.ts",
+    "./caption-fonts": "./src/executor/captionFonts.ts",
+    "./worker": "./src/host/worker.ts"
+  },
+  "publishConfig": {
+    "access": "public",
+    "main": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "exports": {
+      ".": {
+        "types": "./dist/index.d.ts",
+        "import": "./dist/index.js"
+      },
+      "./codec-tables": {
+        "types": "./dist/codec-tables.d.ts",
+        "import": "./dist/codec-tables.js"
+      },
+      "./client": {
+        "types": "./dist/host/client.d.ts",
+        "import": "./dist/host/client.js"
+      },
+      "./place": {
+        "types": "./dist/ir/place.d.ts",
+        "import": "./dist/ir/place.js"
+      },
+      "./qr": {
+        "types": "./dist/qr.d.ts",
+        "import": "./dist/qr.js"
+      },
+      "./facts": {
+        "types": "./dist/ir/facts.d.ts",
+        "import": "./dist/ir/facts.js"
+      },
+      "./captions": {
+        "types": "./dist/executor/captions.d.ts",
+        "import": "./dist/executor/captions.js"
+      },
+      "./caption-fonts": {
+        "types": "./dist/executor/captionFonts.d.ts",
+        "import": "./dist/executor/captionFonts.js"
+      },
+      "./worker": {
+        "types": "./dist/host/worker.d.ts",
+        "import": "./dist/host/worker.js"
+      }
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "build": "tsup && tsc -p tsconfig.build.json",
+    "dev:harness": "vite --config vite.config.ts",
+    "prepublishOnly": "pnpm build"
+  },
+  "dependencies": {
+    "mediabunny": "1.50.3",
+    "qrcode-generator": "^2.0.4",
+    "zod": "4.4.3"
+  },
+  "devDependencies": {
+    "@types/node": "^24.10.1",
+    "@webgpu/types": "^0.1.71",
+    "jsqr": "^1.4.0",
+    "typescript": "7.0.2",
+    "vitest": "^4.1.10",
+    "tsup": "^8.5.0",
+    "vite": "8.1.4",
+    "@katana-video/carrot-backends": "workspace:*"
+  },
+  "private": false
+}
