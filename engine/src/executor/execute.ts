@@ -14,7 +14,8 @@ import { runCopyLane } from './copyLane';
 import { runStill } from './still';
 import { conformVideoSink } from './conform';
 import { GifEncoder } from './gif';
-import { createAudioKernel, createVideoKernel, kernelAudioSink, kernelVideoSink, resolveBackend } from './kernels';
+import { audioKernelsNeedPeak, createAudioKernel, createVideoKernel, kernelAudioSink, kernelVideoSink, resolveBackend } from './kernels';
+import { extractPlanar } from '../nodes/audio';
 
 export interface ExecuteOptions {
   backend?: Backend | 'auto';
@@ -92,10 +93,37 @@ export async function execute(
     return { blob: enc.finish(), videoCodec: null, audioCodec: null, spanCount: spans.length };
   }
 
+  // Peak pre-pass: a level-sensitive kernel (voice enhancement) normalises
+  // against the WHOLE lane, which its span-streaming transform never sees —
+  // decode the audio lanes once into a meter before the real run.
+  let peak: number | undefined;
+  if (plan.audioFormat && audioKernelsNeedPeak(plan)) {
+    const fmt = plan.audioFormat;
+    let p = 0;
+    const meter = {
+      // peak of the MONO MIX — what a downmixing kernel actually sees
+      add(s: import('mediabunny').AudioSample) {
+        const chans = extractPlanar(s, fmt.channels);
+        s.close();
+        for (let i = 0; i < chans[0]!.length; i++) {
+          let m = 0;
+          for (const ch of chans) m += ch[i]!;
+          const a = Math.abs(m / chans.length);
+          if (a > p) p = a;
+        }
+      },
+    };
+    for (const span of spans) {
+      if (signal.aborted) throw signal.reason ?? new DOMException('aborted', 'AbortError');
+      if (span.audio) await runAudioLane(span, { io, audioSource: meter as never, rate: fmt.rate, channels: fmt.channels, signal });
+    }
+    peak = p;
+  }
+
   const job = await buildOutput(plan, opts.sink);
 
   const audioKernel = plan.audioKernels?.length && plan.audioFormat && job.audioSource
-    ? await createAudioKernel(plan, plan.audioFormat) : null;
+    ? await createAudioKernel(plan, { ...plan.audioFormat, ...(peak !== undefined ? { peak } : {}) }) : null;
   const audioSink = audioKernel && job.audioSource && plan.audioFormat
     ? kernelAudioSink(job.audioSource, audioKernel, plan.audioFormat) : null;
   // conform sits closest to the encoder [D5]; the kernel (if any) wraps it

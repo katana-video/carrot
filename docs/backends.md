@@ -40,6 +40,10 @@ backend the run resolved to (`resolveBackend`). Audio kernels use
 (`process(interleaved: Float32Array): Float32Array` + `flush()`), with the
 sample rate and channel count in `ctx`. The `denoise` backend is a complete
 audio-kernel example ([backends/src/denoise/index.ts](../backends/src/denoise/index.ts)).
+A kernel that normalises against the WHOLE file (a level-sensitive model)
+declares `prepass: 'peak'`: the executor first decodes the audio lane once
+and hands `create()` the mono-mix peak as `ctx.peak` — see
+[backends/src/enhance/index.ts](../backends/src/enhance/index.ts).
 
 **Derivers** — whole-artifact work *between* renders (an operation in the
 envelope whose result another operation consumes). The `DeriverBackends`
@@ -87,6 +91,7 @@ tier-0-only hosts.
 | Import | Op | Runtime (optional peer) | Weights | First-run download |
 | --- | --- | --- | --- | --- |
 | `carrot-backends/denoise` → `registerDenoise()` | `denoise` effect (`model`: auto/high → DeepFilterNet f32, mid → int8, low → RNNoise) | none — wasm fetched at first use | `cdn.katana.video/carrot/denoise/v/0.0.5/` | 0.5–14 MB |
+| `carrot-backends/enhance` → `registerEnhance()` | `enhance` effect — VoiceFixer voice restoration (denoise + dereverb + bandwidth extension), 3 s chunks stitched with equal-power seams in quiet spots; mono speech out; needs WebGPU | onnxruntime-web 1.23.2 (pinned CDN import, `ortUrl` to self-host) | `cdn.katana.video/carrot/enhance/v/0.1.0/` (CC BY 4.0) | 234 MB |
 | `carrot-backends/whisper` → `transcribe` | `transcribe` op (`model`: tiny/base/small; `language`) | `@huggingface/transformers` | Hugging Face hub, `onnx-community/whisper-*_timestamped` | 40–250 MB |
 | `carrot-backends/translate` → `translate` | `translate` op (`to`, `from`) | `@huggingface/transformers` | Hugging Face hub, `Xenova/opus-mt-<from>-<to>` (pivots via English) | ~80 MB per pair |
 | `carrot-backends/removebg` → `removebg` | `removebg` op (`model`: quality → BiRefNet-lite, fast → people-only) | `@katana-video/web-bg-removal` | web-bg-removal's CDN | 15–90 MB |
@@ -110,6 +115,7 @@ configureWeights({ baseUrl: 'https://models.example.com/carrot/' });
 
 ```
 <base>/denoise/v/0.0.5/     rnnoise.wasm, dfn.wasm, dfn_weights.pack, dfn_weights_int8.pack, manifest.json, WEIGHTS_LICENSE
+<base>/enhance/v/0.1.0/     chunk_3s_w16.onnx, chunk_3s_w16_weights.bin, manifest.json, WEIGHTS_LICENSE
 <base>/removebg/            web-bg-removal's directory, verbatim
 <base>/hf/<owner>/<model>/  a Hugging Face repo's files, flat (config.json, onnx/…)
 ```

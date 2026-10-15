@@ -48,9 +48,17 @@ export async function createVideoKernel(
   };
 }
 
+/** True when any of the plan's audio kernels asked for the whole-lane peak. */
+export function audioKernelsNeedPeak(plan: CompiledPlan): boolean {
+  return (plan.audioKernels ?? []).some((d) => {
+    const def = getOp(d.op);
+    return def?.lower.family === 'audio-kernel' && def.lower.prepass === 'peak';
+  });
+}
+
 export async function createAudioKernel(
   plan: CompiledPlan,
-  ctx: { rate: number; channels: number },
+  ctx: { rate: number; channels: number; peak?: number },
 ): Promise<AudioStreamTransform | null> {
   const decls = plan.audioKernels;
   if (!decls?.length) return null;

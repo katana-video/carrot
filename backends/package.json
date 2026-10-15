@@ -1,7 +1,7 @@
 {
   "name": "@katana-video/carrot-backends",
   "version": "0.1.0",
-  "description": "Model-backed backends for Carrot \ud83e\udd55: background removal (web-bg-removal), audio denoise (DeepFilterNet/RNNoise), transcription (whisper) and translation (OPUS-MT) \u2014 each an optional subpath import that registers itself against the engine's kernel/deriver contracts. Runs in the browser, weights fetched on first use.",
+  "description": "Model-backed backends for Carrot 🥕: background removal (web-bg-removal), audio denoise (DeepFilterNet/RNNoise), voice enhancement (VoiceFixer on onnxruntime-web/WebGPU), transcription (whisper) and translation (OPUS-MT) — each an optional subpath import that registers itself against the engine's kernel/deriver contracts. Runs in the browser, weights fetched on first use.",
   "license": "MIT",
   "author": "Sam Bhattacharyya",
   "repository": {
@@ -19,6 +19,7 @@
     "webgpu",
     "background-removal",
     "denoise",
+    "voice-enhancement",
     "whisper",
     "transcription",
     "translation",
@@ -34,7 +35,8 @@
     "./removebg": "./src/removebg.ts",
     "./denoise": "./src/denoise/index.ts",
     "./whisper": "./src/whisper/index.ts",
-    "./translate": "./src/translate/index.ts"
+    "./translate": "./src/translate/index.ts",
+    "./enhance": "./src/enhance/index.ts"
   },
   "publishConfig": {
     "access": "public",
@@ -64,6 +66,10 @@
       "./translate": {
         "types": "./dist/translate/index.d.ts",
         "import": "./dist/translate/index.js"
+      },
+      "./enhance": {
+        "types": "./dist/enhance/index.d.ts",
+        "import": "./dist/enhance/index.js"
       }
     }
   },

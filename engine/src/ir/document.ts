@@ -267,6 +267,10 @@ const denoiseEffect = z.object({
     .describe("Denoiser tier; default 'auto' (device capability picks). high/mid = DeepFilterNet3, low = RNNoise floor [H2]"),
 }).strict().describe('AI audio denoise (remove background noise). Applies to the final mixed audio; render top level only [H1]');
 
+const enhanceEffect = z.object({
+  type: z.literal('enhance'),
+}).strict().describe('AI voice enhancement (VoiceFixer): restores noisy, echoey, muffled or low-quality SPEECH — denoise + dereverb + bandwidth extension in one. Speech only (music underneath gets mangled); the output audio is mono. One-time ~224 MB model download, needs WebGPU. Replaces denoise (never both). Render top level only');
+
 const levelEffect = z.object({
   type: z.literal('level'),
   target: z.number().min(-36).max(-6).optional()
@@ -280,7 +284,7 @@ export const effectSchema = z.union([
   duotoneEffect, levelsEffect, vibranceEffect, posterizeEffect, thresholdEffect,
   blurEffect, sharpenEffect, pixelateEffect, grainEffect, vignetteEffect,
   lookEffect,
-  upscaleEffect, denoiseEffect, levelEffect,
+  upscaleEffect, denoiseEffect, enhanceEffect, levelEffect,
 ]).describe('A duration-preserving effect [T3]. Chain order is application order [E1]');
 export type Effect = z.infer<typeof effectSchema>;
 

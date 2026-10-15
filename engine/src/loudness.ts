@@ -18,6 +18,10 @@ export interface LoudnessFacts {
   samplePeakDb: number;
   /** Seconds analyzed. */
   duration: number;
+  /** Peak |sample| of the mono mix (mean of the analyzed channels), linear —
+   * the normalisation input for downmixing models (voice enhancement),
+   * matching the executor's peak prepass. Set by measureLoudness. */
+  monoPeak?: number;
 }
 
 interface Biquad { b0: number; b1: number; b2: number; a1: number; a2: number }
@@ -156,6 +160,7 @@ export async function measureLoudness(
   const duration = Math.min(await input.computeDuration(), maxSeconds);
 
   let meter: LoudnessMeter | null = null;
+  let monoPeak = 0;
   const sink = new AudioSampleSink(track);
   for await (const s of sink.samples(0, duration)) {
     const channels = Math.min(2, s.numberOfChannels); // >2ch: front pair, weight 1
@@ -163,7 +168,13 @@ export async function measureLoudness(
     const chans = extractPlanar(s, channels);
     s.close();
     meter.addPlanar(chans);
+    for (let i = 0; i < chans[0]!.length; i++) {
+      let m = 0;
+      for (const ch of chans) m += ch[i]!;
+      const a = Math.abs(m / chans.length);
+      if (a > monoPeak) monoPeak = a;
+    }
   }
   if (!meter) throw new Error('no audio samples decoded');
-  return meter.result();
+  return { ...meter.result(), monoPeak };
 }

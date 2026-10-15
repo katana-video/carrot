@@ -394,7 +394,7 @@ export function lower(
       }
       // kernels are video/audio-lane [U1, H1] — a clip chain would silently
       // drop them, so refuse honestly here
-      const kernelFx = op.effects.find((f) => f.type === 'upscale' || f.type === 'denoise' || f.type === 'level');
+      const kernelFx = op.effects.find((f) => f.type === 'upscale' || f.type === 'denoise' || f.type === 'level' || f.type === 'enhance');
       if (kernelFx) {
         errors.push(err('usage-unavailable', `${opPath}.effects`, `'${kernelFx.type}' is not available in transformImage`));
         continue;
@@ -453,7 +453,8 @@ function lowerRender(op: RenderOp, oi: number, facts: FactsTable): { plan: Compi
   const upscaleFx = op.effects?.find((f) => f.type === 'upscale');
   const denoiseFx = op.effects?.find((f) => f.type === 'denoise');
   const levelFx = op.effects?.find((f) => f.type === 'level');
-  const geomFx = op.effects?.filter((f) => f.type !== 'upscale' && f.type !== 'denoise' && f.type !== 'level');
+  const enhanceFx = op.effects?.find((f) => f.type === 'enhance');
+  const geomFx = op.effects?.filter((f) => f.type !== 'upscale' && f.type !== 'denoise' && f.type !== 'level' && f.type !== 'enhance');
 
   // ---- slot durations & transitions (consume semantics [X2]) -------------
   interface SlotInfo {
@@ -868,6 +869,15 @@ function lowerRender(op: RenderOp, oi: number, facts: FactsTable): { plan: Compi
       errors.push(err('usage-unavailable', `${opPath}.effects`, 'denoise requires an audio track in the output'));
     } else {
       audioKernels = [{ op: 'denoise', params: { model: denoiseFx.model ?? 'auto' } }];
+    }
+  }
+  // voice enhancement: a whole-output model kernel like denoise (normalize
+  // keeps them exclusive); runs before leveling
+  if (enhanceFx) {
+    if (!op.output.audio || audios.length === 0) {
+      errors.push(err('usage-unavailable', `${opPath}.effects`, 'enhance requires an audio track in the output'));
+    } else {
+      audioKernels = [...(audioKernels ?? []), { op: 'enhance', params: {} }];
     }
   }
   // [H4] adaptive leveling chains AFTER denoise (level the cleaned signal)

@@ -246,7 +246,15 @@ export interface AudioStreamTransform {
   flush(): Float32Array | Promise<Float32Array>;
 }
 
-export interface AudioKernelContext { rate: number; channels: number }
+export interface AudioKernelContext {
+  rate: number;
+  channels: number;
+  /** Peak |sample| of the MONO MIX (mean over channels) of the lane's whole
+   * output — present iff the op
+   * declared `prepass: 'peak'` (level-sensitive models normalise per FILE,
+   * which a span-streaming kernel cannot see on its own). */
+  peak?: number;
+}
 
 export type Lowering =
   /** Pure spec edit: crop, resize, flip, rotate, pad, overlay placement. */
@@ -255,7 +263,13 @@ export type Lowering =
    * Per-backend creators — capability table reports honest availability. */
   | { family: 'kernel'; backends: Partial<Record<Backend, (params: unknown, ctx: KernelContext) => FrameTransform | Promise<FrameTransform>>> }
   /** Whole-output streaming audio kernel [H3] (denoise). */
-  | { family: 'audio-kernel'; create: (params: unknown, ctx: AudioKernelContext) => AudioStreamTransform | Promise<AudioStreamTransform> }
+  | {
+    family: 'audio-kernel';
+    create: (params: unknown, ctx: AudioKernelContext) => AudioStreamTransform | Promise<AudioStreamTransform>;
+    /** 'peak': the executor runs a decode-only pass over the audio lane first
+     * and hands the result to create() as ctx.peak. */
+    prepass?: 'peak';
+  }
   /** Track wiring (mid-graph): subtitle muxing, channel ops. Most routing is
    * plain OutputDecl wiring and needs no op at all. */
   | { family: 'routing' }
@@ -387,7 +401,8 @@ export interface VideoKernelDecl {
  * downmix around the kernel, trim the fixed lead-in delay. */
 export type AudioKernelDecl =
   | { op: 'denoise'; params: { model: 'auto' | 'high' | 'mid' | 'low' } }
-  | { op: 'level'; params: { target: number } };
+  | { op: 'level'; params: { target: number } }
+  | { op: 'enhance'; params: Record<string, never> };
 
 export interface CompiledPlan {
   schemaVersion: typeof SCHEMA_VERSION;

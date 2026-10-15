@@ -45,7 +45,7 @@ export function neededSteps(pipeline: CompiledPipeline): Set<string> {
  * needs-preparation with sizes) BEFORE execution; nothing downloads at
  * compile time. */
 export interface CapabilityRequirement {
-  capability: 'transcribe' | 'translate' | 'removebg' | 'upscale' | 'denoise' | 'level';
+  capability: 'transcribe' | 'translate' | 'removebg' | 'upscale' | 'denoise' | 'level' | 'enhance';
   params: Record<string, unknown>;
 }
 

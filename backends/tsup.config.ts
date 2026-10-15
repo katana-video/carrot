@@ -9,6 +9,7 @@ export default defineConfig({
     weights: 'src/weights.ts',
     removebg: 'src/removebg.ts',
     'denoise/index': 'src/denoise/index.ts',
+    'enhance/index': 'src/enhance/index.ts',
     'whisper/index': 'src/whisper/index.ts',
     'translate/index': 'src/translate/index.ts',
   },

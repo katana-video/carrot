@@ -6,11 +6,13 @@
  * Defaults (nothing configured):
  *   removebg   web-bg-removal's own default (cdn.katana.video/web-bg-removal/…)
  *   denoise    https://cdn.katana.video/carrot/denoise/v/0.0.5/
+ *   enhance    https://cdn.katana.video/carrot/enhance/v/0.1.0/
  *   whisper, translate   the Hugging Face hub (transformers.js defaults)
  *
  * Mirrored layout under `configureWeights({ baseUrl })`:
  *   <base>/removebg/…            web-bg-removal's directory, verbatim
  *   <base>/denoise/v/0.0.5/…     rnnoise.wasm, dfn.wasm, dfn_weights*.pack
+ *   <base>/enhance/v/0.1.0/…     chunk_3s_w16.onnx + chunk_3s_w16_weights.bin
  *   <base>/hf/<owner>/<model>/…  a hub repo's files, flat (onnx/…, config.json, …)
  *
  * Every directory we publish carries a manifest.json (sizes + SHA-256) and a
@@ -45,6 +47,15 @@ export const DEFAULT_DENOISE_BASE = `https://cdn.katana.video/carrot/denoise/v/$
 export function denoiseWeightsBase(override?: string): string {
   if (override) return override.replace(/\/?$/, '/');
   return baseUrl ? `${baseUrl}denoise/v/${DENOISE_WEIGHTS_VERSION}/` : DEFAULT_DENOISE_BASE;
+}
+
+export const ENHANCE_WEIGHTS_VERSION = '0.1.0';
+export const DEFAULT_ENHANCE_BASE = `https://cdn.katana.video/carrot/enhance/v/${ENHANCE_WEIGHTS_VERSION}/`;
+
+/** Voice-enhance (VoiceFixer) directory: configured mirror or the public default. */
+export function enhanceWeightsBase(override?: string): string {
+  if (override) return override.replace(/\/?$/, '/');
+  return baseUrl ? `${baseUrl}enhance/v/${ENHANCE_WEIGHTS_VERSION}/` : DEFAULT_ENHANCE_BASE;
 }
 
 /** web-bg-removal directory under a mirror, or undefined for its own default. */

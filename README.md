@@ -31,7 +31,7 @@ planner-verified example corpus are here, MIT.
 | Package | What | Size |
 | --- | --- | --- |
 | [`@katana-video/carrot`](./engine/) | The engine: IR schema + `plan()`/`preflight()`, span executor, dual-backend (WebGPU/WebGL2) compositor, caption renderer, GIF encoder, probe, worker host + client | ~160 KB (56 KB gzip) entry |
-| [`@katana-video/carrot-backends`](./backends/) | Model-backed backends behind subpath imports: `/denoise` (DeepFilterNet/RNNoise), `/whisper` (transformers.js), `/translate` (OPUS-MT), `/removebg` ([web-bg-removal](https://github.com/katana-video/web-bg-removal)). Heavy runtimes are optional peers, loaded on first use | per-import |
+| [`@katana-video/carrot-backends`](./backends/) | Model-backed backends behind subpath imports: `/denoise` (DeepFilterNet/RNNoise), `/enhance` (VoiceFixer), `/whisper` (transformers.js), `/translate` (OPUS-MT), `/removebg` ([web-bg-removal](https://github.com/katana-video/web-bg-removal)). Heavy runtimes are optional peers, loaded on first use | per-import |
 
 ## Quick start
 

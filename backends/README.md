@@ -28,6 +28,7 @@ createWorkerHost({
 | Import | Provides | Runtime | Weights |
 | --- | --- | --- | --- |
 | `/denoise` | `registerDenoise()` — the `denoise` effect: DeepFilterNet (f32/int8) or RNNoise, wasm, 48 kHz | none | cdn.katana.video (see WEIGHTS_LICENSE) |
+| `/enhance` | `registerEnhance()` — the `enhance` effect: VoiceFixer voice restoration on onnxruntime-web/WebGPU, 3 s chunks stitched with seam-aware equal-power crossfades; also `enhanceBuffer`, `prepareEnhance`, `enhanceSupported` | onnxruntime-web 1.23.2 (pinned CDN import) | cdn.katana.video, CC BY 4.0 (see WEIGHTS_LICENSE) |
 | `/whisper` | `transcribe` deriver — whisper tiny/base/small with word timestamps; also `extractPcm16k`, `toVTT`/`toSRT` | `@huggingface/transformers` | Hugging Face hub |
 | `/translate` | `translate` deriver — OPUS-MT, English pivot for exotic pairs; also `TRANSLATE_LANGUAGES`, `resolveTranslationRoute` | `@huggingface/transformers` | Hugging Face hub |
 | `/removebg` | `removebg` deriver — BiRefNet-lite (quality) / people-only (fast) mattes | `@katana-video/web-bg-removal` | web-bg-removal's CDN |

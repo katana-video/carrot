@@ -280,3 +280,23 @@ DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
 THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+
+======================================================================
+Voice-enhance backend (`/enhance`) — model weights notice
+======================================================================
+
+Fetched at runtime from cdn.katana.video/carrot/enhance/v/0.1.0/ (or a
+configured mirror); the same notice is published alongside the files.
+
+chunk_3s_w16.onnx, chunk_3s_w16_weights.bin
+  VoiceFixer — Haohe Liu et al.  https://github.com/haoheliu/voicefixer
+  Code: MIT License. Checkpoint (Zenodo record 5600188): Creative Commons
+  Attribution 4.0 International (CC BY 4.0),
+  https://creativecommons.org/licenses/by/4.0/
+  Changes: exported to ONNX as one fixed 3 s @ 44.1 kHz graph (analysis
+  UNet + vocoder); the two stride-7 ConvTranspose layers rewritten as
+  sub-pixel convolutions; weights stored as float16 (float32 maths). No
+  retraining. Distributed under the same CC BY 4.0 terms.
+  Citation: Liu et al., "VoiceFixer: Toward General Speech Restoration with
+  Neural Vocoder", arXiv:2109.13731 (2021).

@@ -1628,3 +1628,54 @@ describe('plan(): solid backgrounds — output.background + pad color', () => {
     expect(r.errors.map((e) => e.code)).toContain('unsupported-in-v01');
   });
 });
+
+describe('plan(): voice enhancement kernel [enhance]', () => {
+  it('top-level enhance → an audio kernel at 48 kHz; video stream-copies', () => {
+    const r = plan(doc({
+      timeline: [{ type: 'clip', source: 'a' }],
+      effects: [{ type: 'enhance' }],
+      output: { container: 'mp4', video: { codec: 'auto' }, audio: { codec: 'auto' } },
+    }), FACTS);
+    expect(r.errors).toEqual([]);
+    expect(r.plan!.audioKernels).toEqual([{ op: 'enhance', params: {} }]);
+    expect(r.plan!.audioFormat!.rate).toBe(48000);
+    expect(r.plan!.strategy.video).toBe('copy');
+    expect(r.plan!.strategy.audio).toBe('reencode');
+  });
+
+  it('enhance + level chain in that order', () => {
+    const r = plan(doc({
+      timeline: [{ type: 'clip', source: 'music' }],
+      effects: [{ type: 'level' }, { type: 'enhance' }],
+      output: { container: 'wav' },
+    }), FACTS);
+    expect(r.errors).toEqual([]);
+    expect(r.plan!.audioKernels!.map((k) => k.op)).toEqual(['enhance', 'level']);
+  });
+
+  it('enhance with denoise is an honest error (enhance already denoises)', () => {
+    const r = plan(doc({
+      timeline: [{ type: 'clip', source: 'music' }],
+      effects: [{ type: 'denoise' }, { type: 'enhance' }],
+      output: { container: 'wav' },
+    }), FACTS);
+    expect(r.errors.map((e) => e.code)).toContain('unsupported-in-v01');
+  });
+
+  it('enhance below the top level is rejected [H1]', () => {
+    const r = plan(doc({
+      timeline: [{ type: 'clip', source: 'a', effects: [{ type: 'enhance' }] }],
+      output: av,
+    }), FACTS);
+    expect(r.errors.map((e) => e.code)).toContain('unsupported-in-v01');
+  });
+
+  it('enhance needs an audio track in the output', () => {
+    const r = plan(doc({
+      timeline: [{ type: 'clip', source: 'a' }],
+      effects: [{ type: 'enhance' }],
+      output: { container: 'mp4', video: {} },
+    }), FACTS);
+    expect(r.errors.map((e) => e.code)).toContain('usage-unavailable');
+  });
+});

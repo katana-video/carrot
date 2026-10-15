@@ -684,9 +684,11 @@ duration-preserving [E2]. Any effect breaks stream-copy of the affected track
   `winter` — use for *style* asks; compose primitives only for specifics.
 - **Model-backed [E4]** — legal at the **render top level only**: `upscale`
   (`scale?` default 2, `model?` tier `auto`/`fast`/`balanced`/`quality`/`ultra`),
-  `denoise` (`model?` tier `auto`/`high`/`mid`/`low`), and `level` (adaptive
-  loudness, `target?` LUFS default −16). `denoise` and `level` apply to the
-  final mixed audio.
+  `denoise` (`model?` tier `auto`/`high`/`mid`/`low`), `enhance` (voice
+  restoration — denoise + dereverb + bandwidth extension; speech only, mono
+  out; exclusive with `denoise`), and `level` (adaptive loudness, `target?`
+  LUFS default −16). The audio effects apply to the final mixed audio, in
+  the order denoise/enhance → level.
 
 ### 16.3 Captions (burned subtitles)
 

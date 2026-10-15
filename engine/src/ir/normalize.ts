@@ -159,7 +159,7 @@ export function normalize(input: unknown): NormalizeResult {
 
     // top-level effects: model-backed kernels are legal here (and only here);
     // at most one of each [U1, H1]
-    let sawUpscale = false, sawDenoise = false;
+    let sawUpscale = false, sawDenoise = false, sawEnhance = false;
     op.effects?.forEach((fx, fi) => {
       checkEffect(fx, `${opPath}.effects[${fi}]`, true, errors);
       if (fx.type === 'upscale') {
@@ -170,7 +170,14 @@ export function normalize(input: unknown): NormalizeResult {
         if (sawDenoise) errors.push(err('unsupported-in-v01', `${opPath}.effects[${fi}]`, 'multiple denoise effects are not supported'));
         sawDenoise = true;
       }
+      if (fx.type === 'enhance') {
+        if (sawEnhance) errors.push(err('unsupported-in-v01', `${opPath}.effects[${fi}]`, 'multiple enhance effects are not supported'));
+        sawEnhance = true;
+      }
     });
+    if (sawEnhance && sawDenoise) {
+      errors.push(err('unsupported-in-v01', `${opPath}.effects`, 'enhance already removes noise — use enhance OR denoise, not both'));
+    }
 
     canonicalize(op);
   });
@@ -203,7 +210,7 @@ export function normalize(input: unknown): NormalizeResult {
 }
 
 function checkEffect(fx: Effect, path: string, topLevel: boolean, errors: IrError[]) {
-  if ((fx.type === 'upscale' || fx.type === 'denoise') && !topLevel) {
+  if ((fx.type === 'upscale' || fx.type === 'denoise' || fx.type === 'enhance') && !topLevel) {
     errors.push(err('unsupported-in-v01', path,
       `'${fx.type}' is only supported at the render top level in v0.2 (applies to the composed output) [${fx.type === 'upscale' ? 'U1' : 'H1'}]`));
   }
