@@ -1,6 +1,6 @@
 {
   "name": "@katana-video/carrot",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Carrot \ud83e\udd55 \u2014 media pipelines for the browser, on WebCodecs and Mediabunny. A declarative job IR compiled to streaming spans over hardware codecs, with WebGPU/WebGL2 compositing. The layer above Mediabunny.",
   "license": "MIT",
   "author": "Sam Bhattacharyya",

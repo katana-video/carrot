@@ -1,6 +1,6 @@
 {
   "name": "@katana-video/carrot-backends",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Model-backed backends for Carrot 🥕: background removal (web-bg-removal), audio denoise (DeepFilterNet/RNNoise), voice enhancement (VoiceFixer on onnxruntime-web/WebGPU), transcription (whisper) and translation (OPUS-MT) — each an optional subpath import that registers itself against the engine's kernel/deriver contracts. Runs in the browser, weights fetched on first use.",
   "license": "MIT",
   "author": "Sam Bhattacharyya",
@@ -90,7 +90,7 @@
   },
   "peerDependencies": {
     "@huggingface/transformers": "^4.2.0",
-    "@katana-video/carrot": "^0.1.0",
+    "@katana-video/carrot": "^0.2.0",
     "@katana-video/web-bg-removal": "^0.1.1",
     "mediabunny": "^1.50.0"
   },

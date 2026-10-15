@@ -92,9 +92,11 @@ the spec, the schema and the examples in the order a model should read them.
 
 ## Status
 
-v0.1.0. The engine, IR and planner have been in production at katana.video
-since July 2026 (omni + 15 tool pages); this is the first published cut.
-Public tiers: everything structural (tier 0) plus denoise, transcribe,
+v0.2.0. The engine, IR and planner have been in production at katana.video
+since July 2026 (omni + 15 tool pages). 0.2.0 adds solid render backgrounds
+(`output.background`, filled pad colors) and voice enhancement (`enhance`,
+with the executor's peak pre-pass for whole-file-normalised kernels).
+Public tiers: everything structural (tier 0) plus denoise, enhance, transcribe,
 translate and background removal. Upscaling ships in the hosted product
 through a private backend and is not in this release (see
 [backends](./docs/backends.md#whats-not-here)).
