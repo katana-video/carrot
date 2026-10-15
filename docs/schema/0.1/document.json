@@ -388,7 +388,7 @@
                                     "description": "Target aspect like '9:16' — adds bars (letterbox/pillarbox)"
                                   },
                                   "color": {
-                                    "description": "Bar color; default #000000",
+                                    "description": "Bar color (fills the canvas behind the content); default black for video, transparent for image outputs",
                                     "type": "string",
                                     "pattern": "^#[0-9a-fA-F]{6}$"
                                   }
@@ -1257,7 +1257,7 @@
                                               "description": "Target aspect like '9:16' — adds bars (letterbox/pillarbox)"
                                             },
                                             "color": {
-                                              "description": "Bar color; default #000000",
+                                              "description": "Bar color (fills the canvas behind the content); default black for video, transparent for image outputs",
                                               "type": "string",
                                               "pattern": "^#[0-9a-fA-F]{6}$"
                                             }
@@ -2240,7 +2240,7 @@
                                               "description": "Target aspect like '9:16' — adds bars (letterbox/pillarbox)"
                                             },
                                             "color": {
-                                              "description": "Bar color; default #000000",
+                                              "description": "Bar color (fills the canvas behind the content); default black for video, transparent for image outputs",
                                               "type": "string",
                                               "pattern": "^#[0-9a-fA-F]{6}$"
                                             }
@@ -3254,7 +3254,7 @@
                                     "description": "Target aspect like '9:16' — adds bars (letterbox/pillarbox)"
                                   },
                                   "color": {
-                                    "description": "Bar color; default #000000",
+                                    "description": "Bar color (fills the canvas behind the content); default black for video, transparent for image outputs",
                                     "type": "string",
                                     "pattern": "^#[0-9a-fA-F]{6}$"
                                   }
@@ -4904,7 +4904,7 @@
                           "description": "Target aspect like '9:16' — adds bars (letterbox/pillarbox)"
                         },
                         "color": {
-                          "description": "Bar color; default #000000",
+                          "description": "Bar color (fills the canvas behind the content); default black for video, transparent for image outputs",
                           "type": "string",
                           "pattern": "^#[0-9a-fA-F]{6}$"
                         }
@@ -5554,6 +5554,11 @@
                     ],
                     "additionalProperties": false
                   },
+                  "background": {
+                    "description": "Solid fill behind everything (hex, e.g. '#00ff00'): what transparent or uncovered pixels show — e.g. a removebg cut-out on a solid color. Default: black for video, transparent for png",
+                    "type": "string",
+                    "pattern": "^#[0-9a-fA-F]{6}$"
+                  },
                   "resolution": {
                     "description": "Overrides the canvas rule [V1]",
                     "type": "object",
@@ -6015,7 +6020,7 @@
                           "description": "Target aspect like '9:16' — adds bars (letterbox/pillarbox)"
                         },
                         "color": {
-                          "description": "Bar color; default #000000",
+                          "description": "Bar color (fills the canvas behind the content); default black for video, transparent for image outputs",
                           "type": "string",
                           "pattern": "^#[0-9a-fA-F]{6}$"
                         }

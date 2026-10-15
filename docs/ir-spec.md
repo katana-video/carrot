@@ -668,7 +668,9 @@ duration-preserving [E2]. Any effect breaks stream-copy of the affected track
 - **Geometry:** `crop` (either `aspect: "W:H"` + optional `anchor`, or an
   explicit `region: {x?, y?, width, height}`; **`regionSource` required**, see
   §16.4), `resize` (`width`/`height`, one or both; symbolic scalars allowed),
-  `rotate`, `flip`, `pad` (to an aspect, with bars — the opposite of crop).
+  `rotate`, `flip`, `pad` (to an aspect, with bars — the opposite of crop;
+  an optional hex `color` fills the canvas behind a BASE layer or the
+  composed output — non-base layers pad transparent).
 - **Lighting [E5]:** `brightness`, `contrast`, `saturation` — `{ amount }`,
   CSS-filter multiplier semantics (1 = unchanged).
 - **Filters [E6]:** `grayscale`, `sepia`, `invert`, `hue-rotate`,
@@ -717,4 +719,9 @@ else the container default), `avc`, `hevc`, `vp9`, `av1` — nothing else
 (no ProRes, no DNxHD: WebCodecs has no such encoders). Audio codecs: `auto`,
 `aac`, `opus`, `pcm-s16`, `mp3`; `output.audio.sampleRate` resamples [D6].
 `output.at` selects the instant for `png`/`jpeg` stills [D7].
+`output.background` (hex) is an opaque fill behind every layer — what
+transparent and uncovered pixels show (e.g. a `removebg` cut-out on a solid
+color). Omitted, uncovered pixels are black in video and transparent in
+`png` stills. Precedence per span: a base layer's pad `color`, then a
+top-level pad `color`, then `output.background`.
 

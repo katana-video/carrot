@@ -103,6 +103,14 @@ export function normalize(input: unknown): NormalizeResult {
           const lp = `${path}.layers[${li}]`;
           checkRef(layer.source, `${lp}.source`);
           if (layer.type !== 'audio') layer.effects?.forEach((fx, fi) => checkEffect(fx, `${lp}.effects[${fi}]`, false, errors));
+          // a pad's color fills the canvas behind the BASE; a non-base layer
+          // has no bars of its own to fill (it sits on top of other pixels)
+          if (li > 0 && layer.type !== 'audio') layer.effects?.forEach((fx, fi) => {
+            if (fx.type === 'pad' && fx.color !== undefined) {
+              errors.push(err('unsupported-in-v01', `${lp}.effects[${fi}].color`,
+                'pad colors apply to the base layer only; non-base layers pad transparent'));
+            }
+          });
           // [G2] non-base visual layers require an anchor
           if (li > 0 && (layer.type === 'video' || layer.type === 'image') && !layer.place?.anchor) {
             errors.push(err('missing-place', lp, `non-base ${layer.type} layer requires place.anchor [G2]`));
@@ -195,9 +203,6 @@ export function normalize(input: unknown): NormalizeResult {
 }
 
 function checkEffect(fx: Effect, path: string, topLevel: boolean, errors: IrError[]) {
-  if (fx.type === 'pad' && fx.color !== undefined && fx.color.toLowerCase() !== '#000000') {
-    errors.push(err('unsupported-in-v01', `${path}.color`, 'pad colors other than #000000 are not yet supported'));
-  }
   if ((fx.type === 'upscale' || fx.type === 'denoise') && !topLevel) {
     errors.push(err('unsupported-in-v01', path,
       `'${fx.type}' is only supported at the render top level in v0.2 (applies to the composed output) [${fx.type === 'upscale' ? 'U1' : 'H1'}]`));

@@ -125,7 +125,8 @@ const flipEffect = z.object({
 const padEffect = z.object({
   type: z.literal('pad'),
   aspect: z.string().regex(/^\d+:\d+$/).describe("Target aspect like '9:16' — adds bars (letterbox/pillarbox)"),
-  color: z.string().regex(/^#[0-9a-fA-F]{6}$/).optional().describe('Bar color; default #000000'),
+  color: z.string().regex(/^#[0-9a-fA-F]{6}$/).optional()
+    .describe('Bar color (fills the canvas behind the content); default black for video, transparent for image outputs'),
 }).strict().describe('Pad to a target aspect with bars — the opposite of crop (e.g. landscape into portrait)');
 
 // Lighting filters [E5] — multiplier conventions match CSS filter functions.
@@ -449,6 +450,8 @@ export const outputSchema = z.object({
     from: refSchema.describe('timed-text asset (WebVTT) to mux as a soft subtitle track [D8]'),
     language: z.string().regex(/^[a-z]{3}$/).optional().describe("ISO 639-2/T three-letter code, e.g. 'eng', 'pol' (probe reports the same form)"),
   }).strict().optional().describe('Soft subtitles: a selectable track, NOT burned into pixels. Cue times are OUTPUT-timeline times [D8]'),
+  background: z.string().regex(/^#[0-9a-fA-F]{6}$/).optional()
+    .describe("Solid fill behind everything (hex, e.g. '#00ff00'): what transparent or uncovered pixels show — e.g. a removebg cut-out on a solid color. Default: black for video, transparent for png"),
   resolution: z.object({ width: z.number().int().positive(), height: z.number().int().positive() })
     .strict().optional().describe('Overrides the canvas rule [V1]'),
   fps: z.number().positive().optional().describe('CFR conformance ON REQUEST only; default preserves VFR [D5]'),

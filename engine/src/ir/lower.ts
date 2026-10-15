@@ -141,7 +141,9 @@ const filterStepFor = (fx: Effect, geom: Geometry): FilterStep | null => {
   }
 };
 
-interface Chain { srcRect: Rect; geom: Geometry; F: Mat; color?: ColorXf; filters?: FilterStep[] }
+/** `fill`: the last explicit pad color in the chain — a BASE chain's fill
+ * becomes its span's canvas background (the bars are uncovered canvas). */
+interface Chain { srcRect: Rect; geom: Geometry; F: Mat; color?: ColorXf; filters?: FilterStep[]; fill?: string }
 
 function foldEffects(g0: Geometry, effects: Effect[] | undefined, path: string, errors: IrError[]): Chain {
   let c: Chain = { srcRect: { x: 0, y: 0, w: g0.w, h: g0.h }, geom: { ...g0 }, F: I };
@@ -206,6 +208,7 @@ function foldEffects(g0: Geometry, effects: Effect[] | undefined, path: string, 
       c = {
         ...c, geom: padded,
         F: mul(translate((padded.w - c.geom.w) / 2, (padded.h - c.geom.h) / 2), c.F),
+        ...(fx.color ? { fill: fx.color } : {}),
       };
     }
   }
@@ -279,6 +282,7 @@ interface VisualContrib {
   ramp?: ParamRamp;       // transition fade-in
   rate?: number;          // playback speed (source secs per output sec); default 1
   captions?: CaptionSlotSpec;  // burn-in caption contributor [O5]
+  isBase?: boolean;       // a timeline slot's base — its chain.fill paints the span background
 }
 interface AudioContrib {
   asset: string;
@@ -707,7 +711,7 @@ function lowerRender(op: RenderOp, oi: number, facts: FactsTable): { plan: Compi
       const v: VisualContrib = {
         asset: s.baseAsset, isImage: baseIsImage, chain: baseChain, box,
         opacity: baseOpacity, outStart: s.pos, srcStart: baseIsImage ? 0 : s.baseRange!.start,
-        activeFrom: s.pos, activeTo: slotEnd,
+        activeFrom: s.pos, activeTo: slotEnd, isBase: true,
       };
       if (s.speed !== 1) v.rate = s.speed;
       if (fadeInT > 0) v.ramp = { from: 0, to: baseOpacity, over: [s.pos, s.pos + fadeInT] };
@@ -944,10 +948,15 @@ function lowerRender(op: RenderOp, oi: number, facts: FactsTable): { plan: Compi
         }
         slot++;
       }
+      // background precedence: the span's base pad color (outgoing slot
+      // during a crossfade) → a top-level pad color → output.background
+      const fill = activeV.find((v) => v.isBase && v.chain.fill)?.chain.fill
+        ?? outputChain?.fill ?? op.output.background;
       const lane: VideoLanePlan = {
         bindings,
         composite: {
           canvas: CV, layers,
+          ...(fill ? { background: hex01(fill).map(round6) as [number, number, number] } : {}),
           // top-level non-affine remainder — applied to the composed frame
           ...(outputChain?.filters?.length ? { postFilters: outputChain.filters } : {}),
         },

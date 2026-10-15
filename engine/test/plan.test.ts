@@ -1539,3 +1539,92 @@ describe('plan(): qrcode generator op [Q1]', () => {
     expect(r.errors.some((e) => e.code === 'schema-invalid')).toBe(true);
   });
 });
+
+describe('plan(): solid backgrounds — output.background + pad color', () => {
+  const BG_FACTS: FactsTable = {
+    ...FACTS,
+    photo: { kind: 'image', duration: Infinity, image: { width: 800, height: 600 } },
+    photo2: { kind: 'image', duration: Infinity, image: { width: 640, height: 480 } },
+  };
+  const assets = { photo: { kind: 'image' }, photo2: { kind: 'image' }, a: { kind: 'video' }, logo: { kind: 'image' } };
+  const pipeDoc = (operations: unknown[]) => ({ version: '0.1', assets, operations });
+  const GREEN: [number, number, number] = [0, 1, 0];
+
+  it('removebg cut-out → png on a solid color (the live ask: "replace the background with green")', () => {
+    const r = plan(pipeDoc([
+      { id: 'cut', op: 'removebg', source: 'photo' },
+      { id: 'out', op: 'render', timeline: [{ type: 'clip', source: 'cut' }], output: { container: 'png', background: '#00ff00' } },
+    ]), BG_FACTS);
+    expect(r.errors).toEqual([]);
+    expect(r.plan!.canvas).toEqual({ w: 800, h: 600 });
+    expect(r.plan!.spans[0]!.video!.composite.background).toEqual(GREEN);
+  });
+
+  it('several images: one cut-out + one render each, every render a deliverable', () => {
+    const r = plan(pipeDoc([
+      { id: 'cut1', op: 'removebg', source: 'photo' },
+      { id: 'cut2', op: 'removebg', source: 'photo2' },
+      { id: 'r1', op: 'render', timeline: [{ type: 'clip', source: 'cut1' }], output: { container: 'png', background: '#00ff00' } },
+      { id: 'r2', op: 'render', timeline: [{ type: 'clip', source: 'cut2' }], output: { container: 'png', background: '#00ff00' } },
+    ]), BG_FACTS);
+    expect(r.errors).toEqual([]);
+    expect(r.pipeline!.deliverables).toEqual(['r1', 'r2']);
+    for (const step of r.pipeline!.steps) {
+      if (step.kind === 'render') expect(step.plan.spans[0]!.video!.composite.background).toEqual(GREEN);
+    }
+  });
+
+  it('transformImage pad color now fills (was an unsupported-in-v01 error)', () => {
+    const r = plan(pipeDoc([
+      { id: 'cut', op: 'removebg', source: 'photo' },
+      { id: 'sq', op: 'transformImage', source: 'cut', effects: [{ type: 'pad', aspect: '1:1', color: '#000000' }] },
+    ]), BG_FACTS);
+    expect(r.errors).toEqual([]);
+    const step = r.pipeline!.steps.find((s) => s.id === 'sq');
+    if (step?.kind !== 'transformImage') throw new Error('no transformImage step');
+    expect(step.plan.canvas).toEqual({ w: 800, h: 800 });
+    // explicit black is opaque black now — before, still bars came out transparent
+    expect(step.plan.spans[0]!.video!.composite.background).toEqual([0, 0, 0]);
+  });
+
+  it("pad color on video bars; a base pad's color beats output.background", () => {
+    const r = plan(doc({
+      timeline: [{ type: 'clip', source: 'a', effects: [{ type: 'pad', aspect: '9:16', color: '#ffffff' }] }],
+      output: { ...av, background: '#00ff00' },
+    }), FACTS);
+    expect(r.errors).toEqual([]);
+    expect(r.plan!.spans[0]!.video!.composite.background).toEqual([1, 1, 1]);
+  });
+
+  it('top-level pad color fills the composed output', () => {
+    const r = plan(doc({
+      timeline: [{ type: 'clip', source: 'a' }],
+      effects: [{ type: 'pad', aspect: '1:1', color: '#0000ff' }],
+      output: av,
+    }), FACTS);
+    expect(r.errors).toEqual([]);
+    expect(r.plan!.spans[0]!.video!.composite.background).toEqual([0, 0, 1]);
+  });
+
+  it('no color anywhere → no background key (renderer defaults unchanged)', () => {
+    const r = plan(doc({
+      timeline: [{ type: 'clip', source: 'a', effects: [{ type: 'pad', aspect: '9:16' }] }],
+      output: av,
+    }), FACTS);
+    expect(r.errors).toEqual([]);
+    expect(r.plan!.spans[0]!.video!.composite).not.toHaveProperty('background');
+  });
+
+  it('pad color on a NON-base composition layer is an honest error', () => {
+    const r = plan(doc({
+      timeline: [{
+        type: 'composition', layers: [
+          { type: 'video', source: 'a' },
+          { type: 'image', source: 'logo', place: { anchor: 'top-left' }, effects: [{ type: 'pad', aspect: '1:1', color: '#ff0000' }] },
+        ],
+      }],
+      output: av,
+    }), FACTS);
+    expect(r.errors.map((e) => e.code)).toContain('unsupported-in-v01');
+  });
+});

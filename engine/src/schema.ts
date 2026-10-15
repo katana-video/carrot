@@ -196,6 +196,10 @@ export interface CompositeSpec {
    * commute with blending, so they cannot ride per-layer the way the fused
    * affine color matrix does). */
   postFilters?: FilterStep[];
+  /** Opaque fill behind every layer (straight rgb 0..1): what uncovered and
+   * transparent pixels show — `output.background`, or a pad's bar color.
+   * Omitted = the renderer default (black for video, transparent for stills). */
+  background?: [number, number, number];
 }
 
 /** Resolved burn-in caption styling [O5] (ported from Katana's caption

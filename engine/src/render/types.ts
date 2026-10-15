@@ -21,7 +21,8 @@ export interface RendererInit {
   statics?: Map<number, ImageBitmap>;
   /** Transparent output: alpha-capable canvas cleared to α=0, so uncovered
    * pixels stay transparent (the still png path — transformImage artifacts,
-   * "filter this photo"). Video encoders always get the opaque default. */
+   * "filter this photo"). Video encoders always get the opaque default. A
+   * `spec.background` overrides either default with an opaque fill. */
   transparent?: boolean;
 }
 

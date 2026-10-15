@@ -312,7 +312,9 @@ export async function createWebGL2Renderer(init: RendererInit): Promise<Composit
       gl.viewport(0, 0, spec.canvas.w, spec.canvas.h);
       gl.useProgram(program);
       gl.enable(gl.BLEND);
-      gl.clearColor(0, 0, 0, transparent ? 0 : 1);
+      const bg = spec.background;
+      if (bg) gl.clearColor(bg[0], bg[1], bg[2], 1);
+      else gl.clearColor(0, 0, 0, transparent ? 0 : 1);
       gl.clear(gl.COLOR_BUFFER_BIT);
       layers.forEach((ls, li) => {
         const layer = spec.layers[li]!;

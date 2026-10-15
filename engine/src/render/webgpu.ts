@@ -400,7 +400,9 @@ export async function createWebGPURenderer(init: RendererInit): Promise<Composit
         colorAttachments: [{
           view: post ? post.srcView : ctx.getCurrentTexture().createView(),
           loadOp: 'clear',
-          clearValue: { r: 0, g: 0, b: 0, a: clearA },
+          clearValue: spec.background
+            ? { r: spec.background[0], g: spec.background[1], b: spec.background[2], a: 1 }
+            : { r: 0, g: 0, b: 0, a: clearA },
           storeOp: 'store',
         }],
       });
